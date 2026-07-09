@@ -18,7 +18,5 @@ services:
     depends_on:
       - db
     environment:
-      # Password embedded in the connection string — replace with the same
-      # synthetic canary used above (see README "Where the secrets live").
       DATABASE_URL: "postgres://app_user:pgD3mo_daniel!7f3a9c2e@db:5432/app_prod"
     command: npm start
