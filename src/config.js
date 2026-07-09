@@ -21,4 +21,18 @@ module.exports = {
     apiUrl: 'https://circleci.com/api/v2',
     projectSlug: 'gh/acme/app',
   },
+  datadog: {
+    apiUrl: 'https://api.datadoghq.com',
+  },
+  adobe: {
+    imsUrl: 'https://ims-na1.adobelogin.com',
+  },
+  discord: {
+    apiUrl: 'https://discord.com/api/v10',
+  },
+  etsy: {
+    apiUrl: 'https://openapi.etsy.com/v3',
+    keystring: 'acme-storefront-sync',
+    shopId: '12345678',
+  },
 };
