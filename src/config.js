@@ -1,32 +1,37 @@
 // ⚠️ DEMO FIXTURE — INTENTIONALLY INSECURE ⚠️
 //
-// This file is designed to hold HARDCODED secrets so Snyk's secret-scanning
-// engine has something to detect. The slots below are empty placeholders.
+// Non-secret configuration only. The actual credentials for this demo are
+// deliberately SPRAWLED across the codebase rather than centralized here —
+// because that's how secrets leak in real projects: fallback defaults baked
+// into code, infra compose files, CI workflows, and ad-hoc helper scripts.
 //
-// >>> REPLACE EACH "INSERT_..._HERE" SLOT WITH A SYNTHETIC CANARY VALUE <<<
-//
-// Use non-functional canaries ONLY (e.g. cloud-provider published example
-// keys, or values from the gitleaks / trufflehog test corpora). Never paste a
-// real credential. This file should never ship in a real application — secrets
-// belong in environment variables or a secrets manager.
+// See README "Where the secrets live" for the full map.
 
 module.exports = {
-  // --- PostgreSQL: secret lives inside the connection string (the password) ---
+  // Postgres connection string is injected via DATABASE_URL (see docker-compose.yml).
   database: {
-    url: 'postgres://app_user:pgD3mo_Canary!7f3a9c2e@db.internal.com:5432/app_prod',
+    url: process.env.DATABASE_URL,
   },
 
-  // --- AWS / S3: access key id + secret access key ---
+  // AWS region/bucket are non-secret; the access key pair is a hardcoded
+  // fallback baked into src/s3.js (a classic real-world leak pattern).
   aws: {
     region: 'us-east-1',
-    accessKeyId: 'AKIAIOSFODNN7EXAMPLE',
-    secretAccessKey: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYDANIELKEY',
     bucket: 'acme-app-uploads',
   },
 
-  // --- GitHub: personal access token (classic or fine-grained) ---
+  // GitHub token is provided by CI (see .github/workflows/release.yml) via GITHUB_TOKEN.
   github: {
-    token: 'ghp_jPCwSjjw3L8exKZTsdtw95GJtTS01kqGMcDN',
     apiUrl: 'https://api.github.com',
+  },
+
+  // Postman / CircleCI credentials live in scripts/ (publish-collection.js, check-build.sh).
+  postman: {
+    apiUrl: 'https://api.getpostman.com',
+    collectionId: '12345678-a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+  },
+  circleci: {
+    apiUrl: 'https://circleci.com/api/v2',
+    projectSlug: 'gh/acme/app',
   },
 };

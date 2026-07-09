@@ -1,0 +1,24 @@
+# ⚠️ DEMO FIXTURE — INTENTIONALLY INSECURE ⚠️
+# The Postgres connection string (with its password) is hardcoded straight into
+# the app service's environment — a very common way DB credentials get committed.
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: app_user
+      POSTGRES_PASSWORD: pgD3mo_daniel!7f3a9c2e
+      POSTGRES_DB: app_prod
+    ports:
+      - "5432:5432"
+
+  app:
+    build: .
+    depends_on:
+      - db
+    environment:
+      # Password embedded in the connection string — replace with the same
+      # synthetic canary used above (see README "Where the secrets live").
+      DATABASE_URL: "postgres://app_user:pgD3mo_daniel!7f3a9c2e@db:5432/app_prod"
+    command: npm start

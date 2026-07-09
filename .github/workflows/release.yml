@@ -1,0 +1,24 @@
+# ⚠️ DEMO FIXTURE — INTENTIONALLY INSECURE ⚠️
+# A GitHub token is hardcoded directly into the workflow env instead of being
+# pulled from repository/organization secrets — a classic CI credential leak.
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      # Should be `${{ secrets.GITHUB_TOKEN }}` — hardcoded here on purpose.
+      GITHUB_TOKEN: a350dae5-67fc-57f4-b2c1-fc27c62e5a91
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm ci
+      - name: Verify GitHub auth
+        run: node -e "require('./src/github').getViewer().then(console.log)"

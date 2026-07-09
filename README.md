@@ -4,32 +4,44 @@
 > secret-scanning engine. It hardcodes secrets on purpose. **Do not deploy it,
 > and never put real credentials in it.**
 
-A minimal Node app that connects to **Postgres**, **S3**, and **GitHub**, with
-all three sets of credentials hardcoded in [`src/config.js`](src/config.js) —
-exactly the anti-pattern a secret scanner should flag.
+A minimal Node app that connects to **Postgres**, **S3**, and **GitHub**, plus
+release tooling for **Postman** and **CircleCI**. Its six secrets are
+deliberately **sprawled across the codebase** — fallback defaults in code, an
+infra compose file, a CI workflow, a Dockerfile, and ad-hoc helper scripts —
+instead of being tidily centralized. That mirrors how credentials actually leak, and exercises a
+scanner across multiple file types and directories.
 
-## Layout
+## Where the secrets live
 
-| File | Secret it carries |
-|------|-------------------|
-| `src/config.js` | All hardcoded secrets live here (Postgres password, AWS key pair, GitHub token) |
-| `src/db.js`     | Consumes the Postgres connection string |
-| `src/s3.js`     | Consumes the AWS access key id + secret |
-| `src/github.js` | Consumes the GitHub token |
-| `src/index.js`  | Wires the three together so the secrets are "reachable" |
+| Secret | Location | Leak pattern it demonstrates |
+|--------|----------|------------------------------|
+| Postgres password (in connection string) | [`docker-compose.yml`](docker-compose.yml) | Infra / compose file |
+| AWS access key id + secret | [`src/s3.js`](src/s3.js) (hardcoded `\|\|` fallback) | Fallback default baked into code |
+| GitHub token | [`.github/workflows/release.yml`](.github/workflows/release.yml) | Hardcoded CI workflow credential |
+| Postman API key (`PMAK-…`) | [`scripts/publish-collection.js`](scripts/publish-collection.js) | Ad-hoc helper script |
+| CircleCI PAT (`CCIPAT_…`) | [`scripts/check-build.sh`](scripts/check-build.sh) | Secret inlined in a `curl` / shell snippet |
+| npm registry auth token (`npm_…`) | [`Dockerfile`](Dockerfile) | Token baked into a build `ARG` default |
+
+Non-secret configuration (regions, API base URLs, bucket, collection/project
+IDs) stays in [`src/config.js`](src/config.js); the app modules (`db.js`,
+`s3.js`, `github.js`) read their credentials from the environment, with the
+insecure fallbacks noted above.
 
 ## Setup for the demo
 
-`src/config.js` ships with empty `INSERT_..._HERE` slots. Fill each one with a
+Every secret slot ships as an `INSERT_..._HERE` placeholder. Replace each with a
 **synthetic canary** before scanning:
 
-1. **Postgres** — a `postgres://user:password@host:5432/db` string with any fake password.
-2. **AWS** — use a cloud-provider *published example* key pair (non-functional by design).
-3. **GitHub** — a pattern-valid but fake token.
+1. **Postgres** — a fake password in the `docker-compose.yml` connection string.
+2. **AWS** — a cloud-provider *published example* key pair (non-functional by design).
+3. **GitHub** — a pattern-valid but fake `ghp_…` / `github_pat_…` token.
+4. **Postman** — a `PMAK-<hex>-<hex>` shaped dummy.
+5. **CircleCI** — a `CCIPAT_…` shaped dummy.
+6. **npm** — an `npm_…` shaped dummy registry auth token.
 
-Good public canary sources: the test corpora in
-[gitleaks](https://github.com/gitleaks/gitleaks) and
-[trufflehog](https://github.com/trufflesecurity/trufflehog), which exist
+See [`CANARIES.md`](CANARIES.md) for each slot's exact format and public canary
+sources ([gitleaks](https://github.com/gitleaks/gitleaks),
+[trufflehog](https://github.com/trufflesecurity/trufflehog)), which exist
 precisely for exercising detectors.
 
 ## A note on the local Agent Guard
