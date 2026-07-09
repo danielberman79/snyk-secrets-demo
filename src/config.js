@@ -13,14 +13,14 @@
 module.exports = {
   // --- PostgreSQL: secret lives inside the connection string (the password) ---
   database: {
-    url: 'postgres://app_user:pgD3mo_Canary!7f3a9c2e@db.internal.example.com:5432/app_prod',
+    url: 'postgres://app_user:pgD3mo_Canary!7f3a9c2e@db.internal.com:5432/app_prod',
   },
 
   // --- AWS / S3: access key id + secret access key ---
   aws: {
     region: 'us-east-1',
     accessKeyId: 'AKIAIOSFODNN7EXAMPLE',
-    secretAccessKey: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
+    secretAccessKey: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYDANIELKEY',
     bucket: 'acme-app-uploads',
   },
 
