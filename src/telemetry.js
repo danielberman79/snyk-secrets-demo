@@ -1,4 +1,3 @@
-// Telemetry — ships runtime metrics to Datadog.
 const config = require('./config');
 
 const DD_API_KEY = process.env.DD_API_KEY || 'a1b2c3d4e5f60718293a4b5c6d7e8f90';
